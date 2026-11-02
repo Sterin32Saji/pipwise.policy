@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipewise: pipe, flange and fitting charts with 20 field calculators in 3D</title>
+<meta name="description" content="Pipewise puts ASME pipe, fitting, flange and bolting dimensions next to 20 field calculators, with real-proportion 3D models. Works offline. £9.99 once, no ads, no subscription.">
+<meta name="theme-color" content="#0F1E2B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pipewise: every pipe number, one tap away">
+<meta property="og:description" content="Pipe schedules, flanges, fittings and 20 fitter calculators, with 3D models you can turn. Offline. No ads.">
+<meta property="og:image" content="assets/screens/home_dark.jpg">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preload" href="assets/fonts/BarlowSemiCondensed-Bold.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+@font-face { font-family: Barlow; src: url(assets/fonts/Barlow-Regular.ttf) format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Barlow; src: url(assets/fonts/Barlow-SemiBold.ttf) format("truetype"); font-weight: 600; font-display: swap; }
+@font-face { font-family: BarlowCond; src: url(assets/fonts/BarlowSemiCondensed-SemiBold.ttf) format("truetype"); font-weight: 600; font-display: swap; }
+@font-face { font-family: BarlowCond; src: url(assets/fonts/BarlowSemiCondensed-Bold.ttf) format("truetype"); font-weight: 700; font-display: swap; }
+
+:root {
+  --navy: #0F1E2B; --navy2: #0B1620; --steel: #1C3347; --paper: #EEF1F0; --surface: #fff; --ink: #0F1E2B; --ink2: #485663; --ink3: #6E7B87;
+  --line: #D6DCDF; --hi: #FFC928; --hiInk: #1A1400;
+  --pipe: #13804A; --fit: #1B5FB8; --flg: #F2C200; --valve: #C62F28; --bolt: #DD6417; --mat: #7A4B2A; --calc: #6A3EA1;
+  --r: 22px; --wrap: 1160px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font: 400 17px/1.55 Barlow, system-ui, sans-serif; color: var(--ink); background: var(--paper); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, .cond { font-family: BarlowCond, Barlow, system-ui, sans-serif; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; margin: 0; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+svg.i { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ---------- nav ---------- */
+.nav { position: fixed; inset: 0 0 auto; z-index: 50; transition: background .3s, box-shadow .3s; }
+.nav.solid { background: rgba(11, 22, 32, .86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 1px 0 rgba(255,255,255,.06); }
+.nav .wrap { display: flex; align-items: center; gap: 28px; height: 72px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
+.brand .mark { width: 38px; height: 38px; border-radius: 11px; background: var(--navy); border: 1px solid rgba(255,255,255,.14); display: grid; place-items: center; color: var(--hi); }
+.brand b { font: 700 26px BarlowCond, sans-serif; }
+.nav nav { display: flex; gap: 22px; margin-left: auto; }
+.nav nav a { color: rgba(255,255,255,.78); text-decoration: none; font-weight: 600; font-size: 15.5px; }
+.nav nav a:hover { color: #fff; }
+.btn { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 22px; border-radius: 16px; font: 700 18px BarlowCond, sans-serif; text-decoration: none; border: 0; cursor: pointer; transition: transform .18s cubic-bezier(.2,.9,.3,1.4), box-shadow .2s, background .2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: scale(.97); }
+.btn.hi { background: var(--hi); color: var(--hiInk); box-shadow: 0 10px 30px -10px rgba(255, 201, 40, .7); }
+.btn.ghost { background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.18); }
+.btn.dark { background: var(--navy); color: #fff; }
+.nav .btn { min-height: 44px; font-size: 16px; padding: 0 16px; }
+.play svg { width: 22px; height: 22px; }
+
+/* ---------- hero ---------- */
+.hero { position: relative; overflow: hidden; color: #fff; padding: 140px 0 90px;
+  background: radial-gradient(1200px 600px at 75% 20%, #2A4258 0%, transparent 60%), linear-gradient(160deg, #142636 0%, #0B1620 70%); }
+.hero::before { content: ""; position: absolute; inset: 0; opacity: .5;
+  background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 28px 28px; mask-image: radial-gradient(ellipse at 70% 40%, #000 30%, transparent 75%); }
+.hero .wrap { position: relative; display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
+.marker { display: inline-flex; align-items: center; height: 30px; padding: 0 20px 0 12px; font: 700 14px BarlowCond, sans-serif; letter-spacing: .04em; text-transform: uppercase;
+  clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%); }
+.hero h1 { font-size: clamp(46px, 6.4vw, 84px); margin: 22px 0 18px; }
+.hero h1 em { font-style: normal; color: var(--hi); }
+.lede { font-size: clamp(18px, 1.6vw, 21px); color: rgba(255,255,255,.78); max-width: 34em; margin: 0 0 30px; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.price-note { margin: 16px 0 0; color: rgba(255,255,255,.7); font-weight: 600; }
+.price-note b { color: #fff; }
+.trust { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; padding: 0; list-style: none; }
+.trust li { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 30px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); font-weight: 600; font-size: 15px; }
+.trust svg.i { width: 18px; height: 18px; color: var(--hi); }
+
+/* phones */
+.stage { position: relative; height: 640px; perspective: 1600px; }
+.phone { position: absolute; width: 300px; border-radius: 44px; padding: 32px 10px 12px; background: linear-gradient(145deg, #2b3a48, #0d151c); box-shadow: 0 50px 90px -30px rgba(0,0,0,.75), inset 0 0 0 1.5px rgba(255,255,255,.12); }
+.phone img { width: 100%; border-radius: 10px 10px 34px 34px; aspect-ratio: 786 / 1704; object-fit: cover; object-position: top; background: #0E151C; }
+.phone::after { content: ""; position: absolute; top: 11px; left: 50%; width: 70px; height: 12px; margin-left: -35px; border-radius: 10px; background: #05090c; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.stage .p1 { left: 50%; top: 10px; margin-left: -60px; transform: rotateY(-14deg) rotateX(4deg); z-index: 2; animation: float 7s ease-in-out infinite; }
+.stage .p2 { left: 50%; top: 70px; margin-left: -250px; transform: rotateY(12deg) rotateX(4deg) scale(.88); z-index: 1; filter: brightness(.86); animation: float 7s ease-in-out -3.5s infinite; }
+@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -14px; } }
+
+/* ---------- strip ---------- */
+.strip { background: var(--hi); color: var(--hiInk); overflow: hidden; white-space: nowrap; font: 700 17px BarlowCond, sans-serif; letter-spacing: .04em; }
+.strip .track { display: inline-flex; gap: 40px; padding: 14px 0; animation: marquee 40s linear infinite; }
+.strip span::before { content: "◆"; margin-right: 40px; opacity: .45; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- sections ---------- */
+section { padding: 110px 0; }
+.kicker { display: flex; align-items: center; gap: 10px; font: 700 15px BarlowCond, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--ink2); margin-bottom: 16px; }
+.kicker::before { content: ""; width: 5px; height: 18px; border-radius: 3px; background: var(--hi); }
+h2 { font-size: clamp(36px, 4.4vw, 58px); margin-bottom: 18px; }
+.sub { font-size: 19px; color: var(--ink2); max-width: 40em; margin: 0; }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 54px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 26px; box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 18px 40px -26px rgba(15,30,43,.35); transition: transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .3s; }
+.card:hover { transform: translateY(-4px); box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 28px 50px -26px rgba(15,30,43,.45); }
+.card .ico { width: 54px; height: 54px; border-radius: 15px; display: grid; place-items: center; margin-bottom: 18px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, #fff); border: 1px solid color-mix(in srgb, var(--c) 22%, #fff); }
+.card h3 { font-size: 25px; margin-bottom: 8px; }
+.card p { margin: 0; color: var(--ink2); }
+
+/* split rows */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; }
+.split.rev > :first-child { order: 2; }
+.ticks { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }
+.ticks li { display: flex; gap: 12px; align-items: flex-start; }
+.ticks li::before { content: ""; flex: none; width: 24px; height: 24px; margin-top: 1px; border-radius: 50%; background: var(--hi) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A1400' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4L18 8'/%3E%3C/svg%3E") center/16px no-repeat; }
+.ticks b { font-weight: 600; }
+.show { display: grid; place-items: center; }
+.show .phone { position: relative; width: min(340px, 82vw); }
+
+/* 3D section */
+.dark { background: linear-gradient(170deg, #142636, #0B1620); color: #fff; position: relative; overflow: hidden; }
+.dark .kicker, .dark .sub { color: rgba(255,255,255,.72); }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+.tab { min-height: 46px; padding: 0 18px; border-radius: 23px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; font: 700 17px BarlowCond, sans-serif; cursor: pointer; transition: background .2s, color .2s, transform .2s; }
+.tab:hover { transform: translateY(-1px); }
+.tab[aria-selected="true"] { background: var(--hi); color: var(--hiInk); border-color: var(--hi); }
+.mode { display: inline-flex; margin-top: 18px; padding: 4px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); }
+.mode button { min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: none; color: rgba(255,255,255,.75); font: 600 15px Barlow, sans-serif; cursor: pointer; }
+.mode button[aria-pressed="true"] { background: #fff; color: var(--navy); }
+.caption { margin-top: 22px; min-height: 3.2em; color: rgba(255,255,255,.82); font-size: 17.5px; }
+.swap img { transition: opacity .35s ease, transform .35s ease; }
+.swap img.out { opacity: 0; transform: scale(.98); }
+
+/* search examples */
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 30px; background: #fff; border: 1px solid var(--line); font: 600 17px BarlowCond, sans-serif; }
+.chip code { font: inherit; }
+.chip small { font: 400 14px Barlow, sans-serif; color: var(--ink3); }
+
+/* calculators & tables */
+.groups { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 50px; }
+.group h3 { font-size: 22px; margin: 14px 0 10px; }
+.group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; color: var(--ink2); }
+.group li { display: flex; align-items: center; gap: 8px; }
+.tag3d { font: 700 11.5px BarlowCond, sans-serif; background: var(--hi); color: var(--hiInk); padding: 1px 6px; border-radius: 5px; }
+.tables { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.tables span { padding: 9px 14px 9px 12px; border-radius: 12px; background: #fff; border: 1px solid var(--line); border-left: 6px solid var(--c); font-weight: 600; }
+.tables small { color: var(--ink3); font-weight: 400; }
+
+/* gallery */
+.gallery { display: flex; gap: 22px; overflow-x: auto; padding: 40px 24px 30px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.gallery figure { margin: 0; flex: none; scroll-snap-align: center; text-align: center; }
+.gallery .phone { position: relative; width: 250px; }
+.gallery figcaption { margin-top: 14px; font: 700 18px BarlowCond, sans-serif; }
+.gallery-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.theme { display: inline-flex; padding: 4px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.theme button { min-height: 42px; padding: 0 18px; border: 0; border-radius: 10px; background: none; font: 600 15.5px Barlow, sans-serif; color: var(--ink2); cursor: pointer; }
+.theme button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+
+/* pricing */
+.price { display: grid; grid-template-columns: 1.1fr 1fr; gap: 0; border-radius: 28px; overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: 0 40px 80px -40px rgba(15,30,43,.45); }
+.price .l { padding: 52px; }
+.price .r { padding: 52px; background: linear-gradient(160deg, #1C3347, #0B1620); color: #fff; position: relative; overflow: hidden; }
+.price .r::after { content: ""; position: absolute; right: -40px; top: 0; bottom: 0; width: 140px; opacity: .9;
+  background: repeating-linear-gradient(-55deg, var(--hi) 0 14px, transparent 14px 28px); mask-image: linear-gradient(90deg, transparent, #000); }
+.amount { font: 700 96px/1 BarlowCond, sans-serif; margin: 12px 0 6px; }
+.amount small { font-size: 26px; color: rgba(255,255,255,.7); }
+
+/* about, faq */
+.about { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; }
+.flagmark { width: 96px; height: 96px; border-radius: 26px; background: var(--navy); color: var(--hi); display: grid; place-items: center; }
+.flagmark svg { width: 54px; height: 54px; }
+details { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 0 22px; margin-bottom: 10px; }
+summary { cursor: pointer; list-style: none; padding: 20px 0; font: 700 21px BarlowCond, sans-serif; display: flex; justify-content: space-between; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-size: 28px; line-height: .8; color: var(--ink3); transition: transform .25s; }
+details[open] summary::after { transform: rotate(45deg); }
+details p { margin: 0 0 20px; color: var(--ink2); }
+
+footer { background: var(--navy2); color: rgba(255,255,255,.72); padding: 56px 0 40px; font-size: 15.5px; }
+footer .wrap { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 30px; }
+footer h4 { color: #fff; font: 700 17px BarlowCond, sans-serif; letter-spacing: .06em; text-transform: uppercase; margin: 0 0 12px; }
+footer a { text-decoration: none; display: block; padding: 4px 0; }
+footer a:hover { color: var(--hi); }
+footer .legal { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.1); padding-top: 22px; font-size: 14px; color: rgba(255,255,255,.5); }
+
+/* reveal on scroll */
+.rv { opacity: 0; transform: translateY(26px); transition: opacity .8s cubic-bezier(.2,.8,.2,1), transform .8s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
+.rv.in { opacity: 1; transform: none; }
+
+@media (max-width: 980px) {
+  .hero .wrap, .split, .price { grid-template-columns: 1fr; }
+  .split.rev > :first-child { order: 0; }
+  .stage { height: 560px; }
+  .grid { grid-template-columns: 1fr 1fr; }
+  .groups { grid-template-columns: 1fr 1fr; }
+  .nav nav { display: none; }
+  .nav .btn { margin-left: auto; }
+  footer .wrap { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 620px) {
+  .grid, .groups { grid-template-columns: 1fr; }
+  section { padding: 80px 0; }
+  .stage { height: 500px; }
+  .phone { width: 240px; }
+  .stage .p1 { margin-left: -70px; }
+  .stage .p2 { margin-left: -200px; }
+  .price .l, .price .r { padding: 34px 26px; }
+  .about { grid-template-columns: 1fr; }
+  footer .wrap { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .rv { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2.8 20 7.4v9.2L12 21.2 4 16.6V7.4zM4 7.4l8 4.6 8-4.6M12 12v9.2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zM15.5 15.5 20 20"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM8 6.5h8v3H8zM8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></symbol>
+  <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3 15 15 3l6 6L9 21zM7 11l2 2M10 8l2 2M13 5l2 2M5.5 13.5l1.5 1.5"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></symbol>
+  <symbol id="i-offline" viewBox="0 0 24 24"><path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 4.5-2.5M19 13a10 10 0 0 0-2.4-1.7M2 9.5a15 15 0 0 1 4.5-2.8M22 9.5A15 15 0 0 0 10.5 5.6M12 20h.01"/></symbol>
+  <symbol id="i-elbow" viewBox="0 0 24 24"><path d="M3 9h3a9 9 0 0 1 9 9v3M3 15h3a3 3 0 0 1 3 3v3M3 9v6M9 21h6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M3.5 6h17v12h-17zM3.5 6.5 12 13l8.5-6.5"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8M5 13v6.5h14V13"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M5 3.5v17l15-8.5z"/></symbol>
+</svg>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Pipewise home">
+      <span class="mark"><svg class="i"><use href="#i-elbow"/></svg></span><b>Pipewise</b>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#three-d">3D</a>
+      <a href="#calculators">Calculators</a>
+      <a href="#price">Price</a>
+      <a href="HOW_TO_USE.html">How to use</a>
+    </nav>
+    <a class="btn hi play" href="https://play.google.com/store/apps/details?id=com.pipewise.pipewise"><svg class="i"><use href="#i-play"/></svg>Get it on Google Play</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ======================= HERO ======================= -->
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <span class="marker rv" style="background: var(--pipe)">For fitters · welders · piping engineers</span>
+        <h1 class="rv" style="--d:.08s">Every pipe number,<br><em>one tap away.</em></h1>
+        <p class="lede rv" style="--d:.16s">Pipe schedules, flanges, fittings and bolting from the ASME standards, next to 20 field calculators. Every part is a 3D model you can turn, drawn from real dimensions and from your own numbers.</p>
+        <div class="cta rv" style="--d:.24s">
+          <a class="btn hi play" href="https://play.google.com/store/apps/details?id=com.pipewise.pipewise"><svg class="i"><use href="#i-play"/></svg>Get it on Google Play</a>
+          <a class="btn ghost" href="#three-d"><svg class="i"><use href="#i-cube"/></svg>See it in 3D</a>
+        </div>
+        <p class="price-note rv" style="--d:.3s"><b>£9.99 once.</b> No ads, no subscription, no account.</p>
+        <ul class="trust rv" style="--d:.36s">
+          <li><svg class="i"><use href="#i-offline"/></svg>Works offline</li>
+          <li><svg class="i"><use href="#i-check"/></svg>ASME / MSS data</li>
+          <li><svg class="i"><use href="#i-cube"/></svg>Real-proportion 3D</li>
+        </ul>
+      </div>
+      <div class="stage" id="stage" aria-hidden="true">
+        <div class="phone p2"><img src="assets/screens/rolling_light.jpg" alt="" loading="eager"></div>
+        <div class="phone p1"><img src="assets/screens/home_dark.jpg" alt="" loading="eager"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip" aria-label="Standards covered">
+    <div class="track">
+      <span>ASME B36.10M</span><span>B36.19M</span><span>B16.5</span><span>B16.9</span><span>B16.10</span><span>B16.11</span><span>B16.20</span><span>B1.20.1</span><span>B31.3</span><span>MSS SP-43</span><span>SP-95</span><span>SP-97</span>
+      <span>ASME B36.10M</span><span>B36.19M</span><span>B16.5</span><span>B16.9</span><span>B16.10</span><span>B16.11</span><span>B16.20</span><span>B1.20.1</span><span>B31.3</span><span>MSS SP-43</span><span>SP-95</span><span>SP-97</span>
+    </div>
+  </div>
+
+  <!-- ======================= FEATURES ======================= -->
+  <section id="features">
+    <div class="wrap">
+      <div class="kicker rv">Why fitters keep it on the home screen</div>
+      <h2 class="rv">Built for the job, not the desk.</h2>
+      <p class="sub rv">Pipewise is designed for gloves, sunlight and a phone in one hand, with the answer you need shown first.</p>
+      <div class="grid">
+        <article class="card rv" style="--c: var(--calc)"><div class="ico"><svg class="i"><use href="#i-cube"/></svg></div><h3>See it in 3D</h3><p>Pipe, elbows, tees, reducers, caps and flanges with their studs, in true proportion. Drag to turn, pinch to zoom.</p></article>
+        <article class="card rv" style="--c: var(--fit); --d:.06s"><div class="ico"><svg class="i"><use href="#i-search"/></svg></div><h3>Search that answers</h3><p>Type “6 sch 80” and get the wall, ID and weight straight away. Type “4 300 flange” for the bolt circle and stud length.</p></article>
+        <article class="card rv" style="--c: var(--pipe); --d:.12s"><div class="ico"><svg class="i"><use href="#i-ruler"/></svg></div><h3>Set your size once</h3><p>Pick a size on the tape-measure ruler and every table and calculator opens at it.</p></article>
+        <article class="card rv" style="--c: var(--bolt)"><div class="ico"><svg class="i"><use href="#i-calc"/></svg></div><h3>20 field calculators</h3><p>Offsets, rolling offsets, cut lengths, saddle templates, bolt torque, B31.3 wall thickness and more. Results update as you type.</p></article>
+        <article class="card rv" style="--c: var(--valve); --d:.06s"><div class="ico"><svg class="i"><use href="#i-sun"/></svg></div><h3>Gloves and sunlight</h3><p>Big keys with one-tap fractions and feet/inch buttons, plus a high-contrast Sunlight theme for working outdoors.</p></article>
+        <article class="card rv" style="--c: var(--mat); --d:.12s"><div class="ico"><svg class="i"><use href="#i-offline"/></svg></div><h3>Offline and private</h3><p>No signal needed on site. No account, no ads, and your saved work stays on your phone.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 3D ======================= -->
+  <section class="dark" id="three-d">
+    <div class="wrap split">
+      <div>
+        <div class="kicker rv">Understand the part before you cut</div>
+        <h2 class="rv">Turn it. Read it. Build it.</h2>
+        <p class="sub rv">Every table has a 3D model and a lettered drawing. Tap a value such as “A” or “Y” and it lights up yellow on both. The layout calculators draw your actual job, so a rolling offset sits in its real run, rise and roll box.</p>
+        <div class="tabs rv" role="tablist" aria-label="3D examples">
+          <button class="tab" role="tab" aria-selected="true" data-shot="flange">Flange + bolting</button>
+          <button class="tab" role="tab" aria-selected="false" data-shot="rolling">Rolling offset</button>
+          <button class="tab" role="tab" aria-selected="false" data-shot="elbow">90° elbow</button>
+          <button class="tab" role="tab" aria-selected="false" data-shot="saddle">Branch saddle</button>
+          <button class="tab" role="tab" aria-selected="false" data-shot="pipe">Pipe wall</button>
+        </div>
+        <div class="mode rv" role="group" aria-label="App theme">
+          <button aria-pressed="false" data-mode="light">Light</button>
+          <button aria-pressed="true" data-mode="dark">Dark</button>
+        </div>
+        <p class="caption" id="caption" aria-live="polite"></p>
+      </div>
+      <div class="show rv swap"><div class="phone"><img id="shot3d" src="assets/screens/flange_dark.jpg" alt="Pipewise flange table with a 3D weld-neck flange and its studs"></div></div>
+    </div>
+  </section>
+
+  <!-- ======================= SEARCH ======================= -->
+  <section>
+    <div class="wrap split rev">
+      <div>
+        <div class="kicker rv">Search</div>
+        <h2 class="rv">Ask it the way you'd say it.</h2>
+        <p class="sub rv">Sizes in inches, fractions or DN, schedules, classes and plain words all work. When there's a single answer, it's on the first screen.</p>
+        <div class="chips rv">
+          <span class="chip"><code>6 sch 80</code><small>wall, ID, weight</small></span>
+          <span class="chip"><code>4 300 flange</code><small>bolt circle, studs</small></span>
+          <span class="chip"><code>DN150</code><small>size card</small></span>
+          <span class="chip"><code>2 elbow</code><small>centre to end</small></span>
+          <span class="chip"><code>rolling offset</code><small>calculator</small></span>
+        </div>
+      </div>
+      <div class="show rv"><div class="phone"><img src="assets/screens/search_light.jpg" alt="Search for 6 sch 80 showing outside diameter, wall, inside diameter and weight" loading="lazy"></div></div>
+    </div>
+  </section>
+
+  <!-- ======================= KEYPAD ======================= -->
+  <section style="padding-top: 0">
+    <div class="wrap split">
+      <div>
+        <div class="kicker rv">Made for site work</div>
+        <h2 class="rv">Ten feet three and a half. Six taps.</h2>
+        <ul class="ticks rv">
+          <li><span><b>Feet, inches and fractions</b> as keys, or type <code>10' 3 1/2"</code>, <code>1.2m</code> or <code>450mm</code>.</span></li>
+          <li><span><b>The answer stays visible</b> at the top while the keypad is open, and updates as you type.</span></li>
+          <li><span><b>The live conversion</b> under the number shows inches, feet-inches and millimetres.</span></li>
+          <li><span><b>Save and share</b> a calculation as a cut list, or pin it to your Home screen.</span></li>
+          <li><span><b>Imperial or metric</b>, rounded to 1/8″, 1/16″ or 1/32″.</span></li>
+        </ul>
+      </div>
+      <div class="show rv"><div class="phone"><img src="assets/screens/keypad_dark.jpg" alt="Simple offset calculator with the large keypad open and the travel shown at the top" loading="lazy"></div></div>
+    </div>
+  </section>
+
+  <!-- ======================= CALCULATORS ======================= -->
+  <section id="calculators" style="background:#fff; border-block: 1px solid var(--line)">
+    <div class="wrap">
+      <div class="kicker rv">20 calculators</div>
+      <h2 class="rv">From layout to bolt-up.</h2>
+      <p class="sub rv">Every calculator shows its working and its standard, and flags anything risky, such as an offset too tight for the elbows or a flange class too low for your pressure.</p>
+      <div class="groups">
+        <div class="group rv"><span class="marker" style="background: var(--calc); color:#fff">Layout & fitting</span><ul>
+          <li>Simple offset <span class="tag3d">3D</span></li><li>Rolling offset <span class="tag3d">3D</span></li><li>Pipe cut length</li><li>Cut an elbow to angle <span class="tag3d">3D</span></li><li>Mitred bend</li><li>Branch saddle template <span class="tag3d">3D</span></li></ul></div>
+        <div class="group rv" style="--d:.06s"><span class="marker" style="background: var(--calc); color:#fff">Design & process</span><ul>
+          <li>Wall thickness (B31.3) <span class="tag3d">3D</span></li><li>Flow &amp; pressure drop</li><li>Flange rating (P–T)</li><li>Hydrotest</li><li>Blind / blank thickness</li><li>Thermal expansion</li></ul></div>
+        <div class="group rv" style="--d:.12s"><span class="marker" style="background: var(--calc); color:#fff">Bolting & welding</span><ul>
+          <li>Bolt torque + sequence <span class="tag3d">3D</span></li><li>Weld metal &amp; rods</li><li>Pipe weight &amp; volume <span class="tag3d">3D</span></li><li>Paint &amp; insulation</li></ul></div>
+        <div class="group rv" style="--d:.18s"><span class="marker" style="background: var(--calc); color:#fff">Field maths</span><ul>
+          <li>Slope &amp; drain fall</li><li>Right triangle</li><li>Fractions &amp; decimals</li><li>Unit converter</li></ul></div>
+      </div>
+      <h3 class="rv" style="font-size: 30px; margin-top: 70px">And the reference tables</h3>
+      <div class="tables rv">
+        <span style="--c: var(--pipe)">Pipe dimensions <small>B36.10M / B36.19M</small></span>
+        <span style="--c: var(--fit)">Buttweld fittings <small>B16.9</small></span>
+        <span style="--c: var(--fit)">Stub ends</span>
+        <span style="--c: var(--fit)">Socket-weld &amp; threaded <small>B16.11</small></span>
+        <span style="--c: var(--fit)">Olets &amp; swages</span>
+        <span style="--c: var(--flg)">Flanges, Class 150–2500 <small>B16.5</small></span>
+        <span style="--c: var(--flg)">Gaskets <small>B16.20</small></span>
+        <span style="--c: var(--flg)">P–T ratings</span>
+        <span style="--c: var(--valve)">Valve face to face <small>B16.10</small></span>
+        <span style="--c: var(--bolt)">Studs &amp; nuts</span>
+        <span style="--c: var(--bolt)">NPT threads <small>B1.20.1</small></span>
+        <span style="--c: var(--mat)">Materials &amp; P-numbers</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= GALLERY ======================= -->
+  <section id="gallery" style="padding-bottom: 60px">
+    <div class="wrap gallery-head">
+      <div>
+        <div class="kicker rv">Screens</div>
+        <h2 class="rv" style="margin:0">Light, dark or Sunlight.</h2>
+      </div>
+      <div class="theme rv" role="group" aria-label="Gallery theme">
+        <button aria-pressed="true" data-g="light">Light</button>
+        <button aria-pressed="false" data-g="dark">Dark</button>
+      </div>
+    </div>
+    <div class="gallery" id="gallery-row" tabindex="0" aria-label="App screenshots, scroll sideways">
+      <figure><div class="phone"><img data-n="home" src="assets/screens/home_light.jpg" alt="Home screen with the working size in 3D" loading="lazy"></div><figcaption>Home</figcaption></figure>
+      <figure><div class="phone"><img data-n="pipe" src="assets/screens/pipe_light.jpg" alt="Pipe dimensions with a 3D pipe section" loading="lazy"></div><figcaption>Pipe table</figcaption></figure>
+      <figure><div class="phone"><img data-n="flange" src="assets/screens/flange_light.jpg" alt="Flange table with 3D flange" loading="lazy"></div><figcaption>Flanges</figcaption></figure>
+      <figure><div class="phone"><img data-n="elbow" src="assets/screens/elbow_light.jpg" alt="Buttweld 90 degree elbow in 3D" loading="lazy"></div><figcaption>Fittings</figcaption></figure>
+      <figure><div class="phone"><img data-n="rolling" src="assets/screens/rolling_light.jpg" alt="Rolling offset calculator in 3D" loading="lazy"></div><figcaption>Rolling offset</figcaption></figure>
+      <figure><div class="phone"><img data-n="saddle" src="assets/screens/saddle_light.jpg" alt="Branch saddle template with 3D fishmouth" loading="lazy"></div><figcaption>Saddle template</figcaption></figure>
+      <figure><div class="phone"><img data-n="search" src="assets/screens/search_light.jpg" alt="Search answering 6 sch 80" loading="lazy"></div><figcaption>Search</figcaption></figure>
+      <figure><div class="phone"><img data-n="keypad" src="assets/screens/keypad_light.jpg" alt="Glove-friendly keypad" loading="lazy"></div><figcaption>Keypad</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ======================= PRICE ======================= -->
+  <section id="price" style="padding-top: 40px">
+    <div class="wrap">
+      <div class="price rv">
+        <div class="l">
+          <div class="kicker">One price. Everything.</div>
+          <h2>Buy it once. Own it.</h2>
+          <ul class="ticks">
+            <li><span>All reference tables, all <b>20 calculators</b>, all <b>3D models</b></span></li>
+            <li><span><b>No ads</b>, ever, and nothing locked behind a subscription</span></li>
+            <li><span><b>No account.</b> Your settings and saved work stay on your phone</span></li>
+            <li><span><b>Works offline</b> on site, in plant rooms and in basements</span></li>
+            <li><span>Future updates and fixes included</span></li>
+          </ul>
+        </div>
+        <div class="r">
+          <div class="kicker" style="color: rgba(255,255,255,.7)">Google Play</div>
+          <div class="amount">£9.99 <small>one-off</small></div>
+          <p style="color: rgba(255,255,255,.75); max-width: 22em">Less than a box of cutting discs. Shown in your local currency on Google Play.</p>
+          <a class="btn hi play" style="margin-top: 18px" href="https://play.google.com/store/apps/details?id=com.pipewise.pipewise"><svg class="i"><use href="#i-play"/></svg>Get it on Google Play</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= ABOUT + FAQ ======================= -->
+  <section style="padding-top: 20px">
+    <div class="wrap split" style="align-items: start">
+      <div class="rv">
+        <div class="about">
+          <div class="flagmark"><svg class="i"><use href="#i-elbow"/></svg></div>
+          <div>
+            <div class="kicker" style="margin-bottom: 8px">About</div>
+            <h2 style="font-size: 38px; margin-bottom: 10px">Made in the United Kingdom by an Indian developer.</h2>
+          </div>
+        </div>
+        <p class="sub" style="margin-top: 22px">Pipewise is built and looked after by one person who reads every message. Spotted a value that doesn't match your standard, or want a calculator added? Every calculator and table has a button that emails me your inputs, so fixes are quick.</p>
+        <div class="cta" style="margin-top: 26px">
+          <a class="btn dark" href="mailto:hello@sterin.dev"><svg class="i"><use href="#i-mail"/></svg>hello@sterin.dev</a>
+          <a class="btn" style="background:#fff; border:1px solid var(--line)" href="HOW_TO_USE.html">Read the guide</a>
+        </div>
+      </div>
+      <div class="rv" style="--d:.08s">
+        <div class="kicker">Questions</div>
+        <details><summary>Does it work without signal?</summary><p>Yes. All tables, calculators and 3D models are built into the app. Nothing needs the internet.</p></details>
+        <details><summary>Where do the numbers come from?</summary><p>ASME B36.10M, B36.19M, B16.5, B16.9, B16.10, B16.11, B16.20, B1.20.1 and MSS SP-43/95/97, with calculators following ASME B31.3 where noted. Olet and swage figures are typical manufacturer values. It's a field reference, so always check critical dimensions against the current standard and your project specification.</p></details>
+        <details><summary>Inches or millimetres?</summary><p>Both. Choose imperial (feet-inch-fractions, psi, °F) or metric (mm, bar, °C) and switch any time. Every value converts straight away.</p></details>
+        <details><summary>Is there an iPhone version?</summary><p>Pipewise is on Android today. If you'd like it on iPhone, email <a href="mailto:hello@sterin.dev">hello@sterin.dev</a>. Demand decides what comes next.</p></details>
+        <details><summary>What data does the app collect?</summary><p>No accounts and no ads. Your settings and saved calculations stay on your phone. See the <a href="PRIVACY_POLICY.html">privacy policy</a> for the full details.</p></details>
+        <details><summary>Refunds?</summary><p>Purchases are handled by Google Play, including refunds under Google Play's policy. If something isn't right, email me first and I'll do my best to fix it.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="#top" style="margin-bottom: 12px"><span class="mark"><svg class="i"><use href="#i-elbow"/></svg></span><b>Pipewise</b></a>
+      <p style="margin: 12px 0 0; max-width: 28em">Piping reference tables and field calculators with 3D models. Made in the United Kingdom.</p>
+    </div>
+    <div>
+      <h4>App</h4>
+      <a href="https://play.google.com/store/apps/details?id=com.pipewise.pipewise">Google Play</a>
+      <a href="HOW_TO_USE.html">How to use</a>
+      <a href="#features">Features</a>
+    </div>
+    <div>
+      <h4>Contact &amp; legal</h4>
+      <a href="mailto:hello@sterin.dev">hello@sterin.dev</a>
+      <a href="PRIVACY_POLICY.html">Privacy policy</a>
+    </div>
+    <p class="legal">© 2026 Pipewise. ASME, MSS and ASTM standard numbers identify the source of the data; Pipewise isn't affiliated with or endorsed by those organisations. Google Play is a trademark of Google LLC.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // solid nav after the hero
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('solid', scrollY > 40);
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // reveal on scroll
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.12 });
+  document.querySelectorAll('.rv').forEach((el) => reduce ? el.classList.add('in') : io.observe(el));
+
+  // hero phones lean towards the pointer
+  const stage = document.getElementById('stage');
+  if (stage && !reduce && matchMedia('(pointer: fine)').matches) {
+    const phones = stage.querySelectorAll('.phone');
+    addEventListener('pointermove', (e) => {
+      const x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5;
+      phones[1].style.transform = `rotateY(${-14 + x * 10}deg) rotateX(${4 - y * 8}deg)`;
+      phones[0].style.transform = `rotateY(${12 + x * 8}deg) rotateX(${4 - y * 6}deg) scale(.88)`;
+    }, { passive: true });
+  }
+
+  // 3D showcase
+  const captions = {
+    flange: 'A Class 150 weld-neck flange with its gasket, studs and nuts, to B16.5 proportions. Tap “Stud length” and the studs light up.',
+    rolling: 'Your rolling offset in its run, rise and roll box. Change a number and the model, travel and cut length update together.',
+    elbow: 'Buttweld fittings in true proportion. “A” runs from each welding end to the work point, exactly as you measure it.',
+    saddle: 'The fishmouth sits on the header, and the ordinate lines show where the template transfers to the pipe.',
+    pipe: 'Every schedule in true proportion, so Sch 10 and XXS look as different as they are. The wall ring lights up when you tap “T”.',
+  };
+  let shot = 'flange', mode = 'dark';
+  const img = document.getElementById('shot3d'), cap = document.getElementById('caption');
+  const show = () => {
+    const src = `assets/screens/${shot}_${mode}.jpg`;
+    cap.textContent = captions[shot];
+    if (img.getAttribute('src') === src) return;
+    if (reduce) { img.src = src; return; }
+    img.classList.add('out');
+    const next = new Image();
+    next.onload = () => setTimeout(() => { img.src = src; img.classList.remove('out'); }, 120);
+    next.src = src;
+  };
+  document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', x === b));
+    shot = b.dataset.shot; show();
+  }));
+  document.querySelectorAll('.mode button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.mode button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    mode = b.dataset.mode; show();
+  }));
+  show();
+
+  // gallery theme
+  document.querySelectorAll('.theme button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.theme button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    document.querySelectorAll('#gallery-row img').forEach((im) => { im.src = `assets/screens/${im.dataset.n}_${b.dataset.g}.jpg`; });
+  }));
+})();
+</script>
+</body>
+</html>
